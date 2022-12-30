@@ -1,5 +1,5 @@
-<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.herokuapp.com?font=Unbounded&pause=1000&color=95694D&background=FFF7E5&center=%D0%9B%D0%9E%D0%96%D0%AC&vCenter=%D0%9B%D0%9E%D0%96%D0%AC&multiline=true&repeat=%D0%B8%D1%81%D1%82%D0%B8%D0%BD%D0%BD%D1%8B%D0%B9&width=435&lines=BUNNY+RUNNER" alt="Typing SVG" /></a>
-<h3 align="center">BUNNY RUNNER - обычная бегалка, играя в  которую, ты сможешь продемонстрировать ловкость и быстроту реакции.</h3>
+<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.herokuapp.com?font=Unbounded&pause=1000&color=95694D&background=FFF7E5&center=%D0%9B%D0%9E%D0%96%D0%AC&vCenter=%D0%9B%D0%9E%D0%96%D0%AC&multiline=true&repeat=%D0%B8%D1%81%D1%82%D0%B8%D0%BD%D0%BD%D1%8B%D0%B9&width=435&lines=CUTIESCAPE" alt="Typing SVG" /></a>
+<h3 align="center">CUTIESCAPE - обычная бегалка, играя в  которую, ты сможешь продемонстрировать ловкость и быстроту реакции.</h3>
 <h3 align="center">ТЗ:</h3>
 <h3 align="center">-Реализовать стартовое окно</h3>
 <h3 align="center">-Реализовать окно выбора скина игрока</h3>
