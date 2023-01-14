@@ -229,7 +229,7 @@ class White(pygame.sprite.Sprite):
         self.cnt += 1
 
 
-class Robot1(pygame.sprite.Sprite):
+class WhiteRobot(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(obstacles_group, all_sprites)
         self.frames = []
@@ -270,7 +270,7 @@ class Robot1(pygame.sprite.Sprite):
         self.cnt += 1
 
 
-class Robot2(pygame.sprite.Sprite):
+class GreenRobot(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(obstacles_group, all_sprites)
         self.frames = []
@@ -314,8 +314,8 @@ class Robot2(pygame.sprite.Sprite):
 
 
 m_white = White()
-robot = Robot1()
-robot2 = Robot2()
+robot = WhiteRobot()
+robot2 = GreenRobot()
 
 
 class Runner(pygame.sprite.Sprite):
