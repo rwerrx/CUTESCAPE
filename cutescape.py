@@ -25,8 +25,6 @@ BLACK = pygame.Color('black')
 run = True
 FPS = 30
 clock = pygame.time.Clock()
-speed = 1
-
 columns = 6
 rows = 1
 x, y = 100, 350
@@ -36,9 +34,9 @@ cnt_monsters = 0
 cnt2 = 0
 f = False
 f2 = False
-f3 = False
 cnt_sc = [0]
 cnt_rd = 0
+speed = -15
 
 
 def load_image(name, colorkey=None):
@@ -129,9 +127,14 @@ def start_screen():
 
 
 def text(message, x, y, font_type=None, font_size=30):
+    global f2
+    if f2:
+        col = pygame.Color('white')
+    else:
+        col = pygame.Color('#2E8B57')
     font_type = pygame.font.Font(font_type, font_size)
-    text = font_type.render(message, True, pygame.Color('white'))
-    screen.blit(text, (x, y))
+    t = font_type.render(message, True, col)
+    screen.blit(t, (x, y))
 
 
 start_screen()
@@ -165,12 +168,16 @@ def stopped(lt):
         screen.blit(string_rendered, intro_rect)
 
 
-class White(pygame.sprite.Sprite):
+def withdrawal_of_records():
+    file = open('results.txt', 'w', encoding='utf8')
+    file.write(f'record: {max(cnt_sc)}')
+    file.close()
 
+
+class White(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(obstacles_group, all_sprites)
         self.frames = []
-
         self.columns = 4
         self.rows = 1
         self.sheet = pygame.transform.scale(pygame.transform.flip(load_image(choice(monsters)), True, False),
@@ -178,9 +185,11 @@ class White(pygame.sprite.Sprite):
         self.cut_sheet(self.sheet, self.columns, self.rows)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.rect.move(1000, y)
         self.cnt = cnt_monsters
         self.cnt_rd = cnt_rd
+        self.speed = speed
 
     def cut_sheet(self, sheet, columns, rows):
         self.rect = pygame.Rect(0, -50, sheet.get_width() // columns,
@@ -195,30 +204,27 @@ class White(pygame.sprite.Sprite):
         if self.cnt % 4 == 0:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
+            self.mask = pygame.mask.from_surface(self.image)
         if f2:
-            self.rect = self.rect.move(-15, 0)
+            self.speed = -15
         else:
-            self.rect = self.rect.move(-20, 0)
-
+            self.speed = -25
+        self.rect = self.rect.move(speed, 0)
         if self.rect.x < -300:
             self.rect.x = randrange(1000, 1200)
             self.sheet = pygame.transform.scale(pygame.transform.flip(load_image(choice(monsters)), True, False),
                                                 (120, 120))
-
         self.cnt += 1
 
 
 class Robot(pygame.sprite.Sprite):
-
     def __init__(self):
         super().__init__(obstacles_group, all_sprites)
         self.frames = []
-
         self.columns = 3
         self.rows = 1
         self.k = choice([1, 2])
         if self.k == 1:
-
             self.sheet = pygame.transform.scale(pygame.transform.flip(load_image('grobotrun4.png'), True, False),
                                                 (400, 120))
             self.columns = 4
@@ -229,8 +235,10 @@ class Robot(pygame.sprite.Sprite):
         self.cut_sheet(self.sheet, self.columns, self.rows)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.rect.move(1500, y)
         self.cnt = cnt_monsters
+        self.speed = speed
 
     def cut_sheet(self, sheet, columns, rows):
         self.rect = pygame.Rect(0, -50, sheet.get_width() // columns,
@@ -245,23 +253,22 @@ class Robot(pygame.sprite.Sprite):
         if self.cnt % 4 == 0:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
+            self.mask = pygame.mask.from_surface(self.image)
         if f2:
-            self.rect = self.rect.move(-15, 0)
+            self.speed = -15
         else:
-            self.rect = self.rect.move(-20, 0)
-
+            self.speed = -25
+        self.rect = self.rect.move(speed, 0)
         if self.rect.x < -300:
             self.rect.x = randrange(2000, 2800)
             self.k = choice([1, 2, 2])
             if self.k == 1:
-
                 self.sheet = pygame.transform.scale(pygame.transform.flip(load_image('grobotrun4.png'), True, False),
                                                     (400, 120))
                 self.columns = 4
             else:
                 self.sheet = pygame.transform.scale(pygame.transform.flip(load_image('wrobotrun3.png'), True, False),
                                                     (400, 120))
-
         self.cnt += 1
 
 
@@ -272,7 +279,6 @@ robot = Robot()
 class Runner(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(runner_group, all_sprites)
-
         self.isJump = False
         self.jumpCount = 10
         sheet = pygame.transform.scale(load_image('omrun_6.png'), (500, 100))
@@ -285,6 +291,7 @@ class Runner(pygame.sprite.Sprite):
         self.rect.midbottom = (250, h)
         self.cnt = cnt_runner
         self.col = False
+        self.mask = pygame.mask.from_surface(self.image)
         self.cnt_rd = cnt_rd
 
     def cut_sheet(self, sheet, columns):
@@ -301,36 +308,82 @@ class Runner(pygame.sprite.Sprite):
         if self.cnt % 2 == 0 and self.isJump is False:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
+            self.mask = pygame.mask.from_surface(self.image)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             self.isJump = True
-
         if self.isJump is True:
-
             if self.jumpCount >= -10:
-
                 if self.jumpCount < 0:
                     self.rect.y += (self.jumpCount ** 2) // 2
                 else:
                     self.rect.y -= (self.jumpCount ** 2) // 2
-
                 self.jumpCount -= 1
-
             else:
                 self.isJump = False
                 self.jumpCount = 10
         self.cnt += 1
-        if pygame.sprite.collide_mask(self, m_white) or pygame.sprite.collide_mask(self, robot):
-            f = True
+        collided = pygame.sprite.spritecollideany(self, obstacles_group)
+        if collided:
+            if pygame.sprite.collide_mask(self, collided):
+                if f2:
+
+                    collided.rect.x += 15
+                else:
+                    collided.rect.x += 30
+                f = True
+
+
+def final_screen():
+    global scores, run, f, f2, cnt2
+    intro_text = ["GAME OVER"]
+    if f2:
+        fon = pygame.transform.scale(load_image('background1.png'), (w, h))
+    else:
+        fon = pygame.transform.scale(load_image('background2.png'), (w, h))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 50)
+    text_coord = 50
+    for line in intro_text:
+        if f2:
+            col = pygame.Color('#708090')
+        else:
+            col = pygame.Color('white')
+        string_rendered = font.render(line, 1, col)
+        intro_rect = string_rendered.get_rect()
+        text_coord += 150
+        intro_rect.top = text_coord
+        intro_rect.x = 100
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+        font = pygame.font.Font(None, 50)
+        text_coord = 50
+        cnt_sc.append(int(scores))
+        text(f'PRESS ENTER TO PLAY AGAIN, record: {str(max(cnt_sc))}, TO DISPLAY THE RESULTS IN A TXT FILE, PRESS 1',
+             50, 100)
+        for event in pygame.event.get():
+            keys = pygame.key.get_pressed()
+            if event.type == pygame.QUIT:
+                run = False
+                f = False
+            if keys[pygame.K_ESCAPE]:
+                run = False
+                f = False
+            if keys[pygame.K_RETURN]:
+                m_white.rect.x += randrange(1100, 1300)
+                robot.rect.x += randrange(1500, 1700)
+                f = False
+            if keys[pygame.K_1]:
+                withdrawal_of_records()
+        cnt2, scores = 0, 0
+        pygame.display.flip()
 
 
 background = Background()
-
 runner = Runner()
 while run:
     screen.fill(BLACK)
     cnt2 += 1
-
     clock.tick(FPS)
     for event in pygame.event.get():
         keys = pygame.key.get_pressed()
@@ -338,52 +391,26 @@ while run:
             run = False
         if event.type == pygame.KEYDOWN:
             runner.update(event.key)
-        if keys[pygame.K_END]:
-
+        if keys[pygame.K_2]:
             paused = True
-
             while paused:
-                print(1)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         terminate()
                     keys = pygame.key.get_pressed()
                     if keys[pygame.K_RETURN]:
                         paused = False
-                    text('PRESS ENTER TO  CONTINUE THE GAME', 100, 100)
+                text('PRESS ENTER TO  CONTINUE THE GAME', 100, 100)
             pygame.display.flip()
-
     runner.update()
     m_white.update()
     robot.update()
     all_sprites.draw(screen)
     scores = cnt2 // 10
-    text('score: ' + str(scores), 800, 30)
+    text('scores: ' + str(scores), 800, 30)
     obstacles_group.draw(screen)
     while f:
-
-        font = pygame.font.Font(None, 50)
-        text_coord = 50
-        text(f'PRESS ENTER TO PLAY AGAIN, record: {str(max(cnt_sc))}', 100, 100)
-        for event in pygame.event.get():
-            keys = pygame.key.get_pressed()
-            if event.type == pygame.QUIT:
-                run = False
-                f = False
-
-            if keys[pygame.K_ESCAPE]:
-                run = False
-                f = False
-
-            if keys[pygame.K_RETURN]:
-                m_white.rect.x += randrange(1100, 1300)
-                robot.rect.x += randrange(1500, 1700)
-                f = False
-        cnt_sc.append(int(scores))
-        cnt2, scores = 0, 0
-
-        pygame.display.flip()
-
+        final_screen()
     pygame.display.flip()
 pygame.quit()
 quit()
