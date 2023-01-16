@@ -39,23 +39,23 @@ cnt2 = 0
 cnt_sc = [0]
 cnt_rd = 0
 speed = -15
-
+cnt_d = -1
 f = False
 f2 = False
 run = True
 
 
-def load_image(name, colorkey=None):
+def load_image(name, color_key=None):
     fullname = os.path.join('data', name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
     image = pygame.image.load(fullname)
-    if colorkey is not None:
+    if color_key is not None:
         image = image.convert()
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey)
+        if color_key == -1:
+            color_key = image.get_at((0, 0))
+        image.set_colorkey(color_key)
     else:
         image = image.convert_alpha()
     return image
@@ -78,7 +78,7 @@ def start_screen():
     text_coord = 50
 
     for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('black'))
+        string_rendered = font.render(line, True, pygame.Color('black'))
         intro_rect = string_rendered.get_rect()
         text_coord += 100
         intro_rect.top = text_coord
@@ -91,7 +91,7 @@ def start_screen():
         but_x2 = 100
         but_y2 = 300
         screen.blit(play_but, (but_x2, but_y2))
-        string_rendered = pb_font.render(line, 1, pygame.Color('black'))
+        string_rendered = pb_font.render(line, True, pygame.Color('black'))
         intro_rect = string_rendered.get_rect()
         text_coord += 135
         intro_rect.top = text_coord
@@ -104,7 +104,7 @@ def start_screen():
         but_x = 100
         but_y = 200
         screen.blit(play_but, (but_x, but_y))
-        string_rendered = pb_font.render(line, 1, pygame.Color('black'))
+        string_rendered = pb_font.render(line, True, pygame.Color('black'))
         intro_rect = string_rendered.get_rect()
         text_coord += -125
         intro_rect.top = text_coord
@@ -113,12 +113,14 @@ def start_screen():
         screen.blit(string_rendered, intro_rect)
 
     while True:
-
+        but_x = 100
+        but_y = 200
+        but_x2 = 100
+        but_y2 = 300
+        keys_pressed = pygame.key.get_pressed()
+        if keys_pressed[pygame.K_RETURN]:
+            return
         for event in pygame.event.get():
-            keys = pygame.key.get_pressed()
-
-            if keys[pygame.K_RETURN]:
-                return
 
             if event.type == pygame.QUIT:
                 terminate()
@@ -172,7 +174,7 @@ def stopped(lt):
     text_coord = 100
     n = 100
     for line in lt:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
+        string_rendered = font.render(line, True, pygame.Color('white'))
         intro_rect = string_rendered.get_rect()
         intro_rect.top = text_coord
         n += 20
@@ -192,8 +194,9 @@ class White(pygame.sprite.Sprite):
         self.frames = []
         self.columns = 4
         self.rows = 1
-        self.sheet = pygame.transform.scale(pygame.transform.flip(load_image(choice(monsters)), True, False),
-                                            (400, 120))
+        self.sheet = pygame.transform.scale(
+            pygame.transform.flip(load_image(choice(monsters)), True, False),
+            (400, 120))
         self.cut_sheet(self.sheet, self.columns, self.rows)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
@@ -224,8 +227,9 @@ class White(pygame.sprite.Sprite):
         self.rect = self.rect.move(speed, 0)
         if self.rect.x < -300:
             self.rect.x = randrange(1000, 1200)
-            self.sheet = pygame.transform.scale(pygame.transform.flip(load_image(choice(monsters)), True, False),
-                                                (120, 120))
+            self.sheet = pygame.transform.scale(
+                pygame.transform.flip(load_image(choice(monsters)), True, False),
+                (120, 120))
         self.cnt += 1
 
 
@@ -235,8 +239,9 @@ class WhiteRobot(pygame.sprite.Sprite):
         self.frames = []
         self.columns = 3
         self.rows = 1
-        self.sheet = pygame.transform.scale(pygame.transform.flip(load_image('wrobotrun3.png'), True, False),
-                                            (400, 120))
+        self.sheet = pygame.transform.scale(
+            pygame.transform.flip(load_image('wrobotrun3.png'), True, False),
+            (400, 120))
         self.columns = 3
         self.cut_sheet(self.sheet, self.columns, self.rows)
         self.cur_frame = 0
@@ -277,15 +282,16 @@ class GreenRobot(pygame.sprite.Sprite):
         self.columns = 3
         self.rows = 1
 
-        self.sheet = pygame.transform.scale(pygame.transform.flip(load_image('grobotrun4.png'), True, False),
-                                            (400, 120))
+        self.sheet = pygame.transform.scale(
+            pygame.transform.flip(load_image('grobotrun4.png'), True, False),
+            (400, 120))
         self.columns = 4
 
         self.cut_sheet(self.sheet, self.columns, self.rows)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.rect.move(1700, y)
+        self.rect = self.rect.move(1800, y)
         self.cnt = cnt_monsters
         self.speed = speed
 
@@ -309,7 +315,7 @@ class GreenRobot(pygame.sprite.Sprite):
             self.speed = -25
         self.rect = self.rect.move(speed, 0)
         if self.rect.x < -300:
-            self.rect.x = randrange(3000, 3200)
+            self.rect.x = randrange(3100, 3300)
         self.cnt += 1
 
 
@@ -335,6 +341,7 @@ class Runner(pygame.sprite.Sprite):
         self.col = False
         self.mask = pygame.mask.from_surface(self.image)
         self.cnt_rd = cnt_rd
+        self.cnt_d = cnt_d
 
     def cut_sheet(self, sheet, columns):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
@@ -351,8 +358,8 @@ class Runner(pygame.sprite.Sprite):
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
             self.mask = pygame.mask.from_surface(self.image)
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
+        keys_pressed = pygame.key.get_pressed()
+        if keys_pressed[pygame.K_SPACE]:
             self.isJump = True
         if self.isJump is True:
             if self.jumpCount >= -10:
@@ -367,6 +374,8 @@ class Runner(pygame.sprite.Sprite):
         self.cnt += 1
         collided = pygame.sprite.spritecollideany(self, obstacles_group)
         if collided:
+            for elem in obstacles_group:
+                elem.speed = 0
             if pygame.sprite.collide_mask(self, collided):
                 if f2:
 
@@ -395,7 +404,7 @@ def final_screen():
             col = pygame.Color('#2E8B57')
         else:
             col = pygame.Color('black')
-        string_rendered = font.render(line, 1, col)
+        string_rendered = font.render(line, True, col)
         intro_rect = string_rendered.get_rect()
         text_coord += 0
         intro_rect.top = text_coord
@@ -405,15 +414,16 @@ def final_screen():
         font = pygame.font.Font(None, 50)
         text_coord = 50
         cnt_sc.append(int(scores))
-        text(f'PRESS ENTER TO PLAY AGAIN, record: {str(max(cnt_sc))}, TO DISPLAY THE RESULTS IN A TXT FILE, PRESS 1',
-             50, 100)
+        text(
+            f'PRESS ENTER TO PLAY AGAIN, record: {str(max(cnt_sc))}, TO DISPLAY THE RESULTS IN A TXT FILE, PRESS 1',
+            50, 100)
 
         for line in hl_text:
             play_but.fill(pygame.Color('#2E8B57'))
             but_x2 = 100
             but_y2 = 300
             screen.blit(play_but, (but_x2, but_y2))
-            string_rendered = pb_font.render(line, 1, pygame.Color('black'))
+            string_rendered = pb_font.render(line, True, pygame.Color('black'))
             intro_rect = string_rendered.get_rect()
             text_coord += 265
             intro_rect.top = text_coord
@@ -426,7 +436,7 @@ def final_screen():
             but_x = 100
             but_y = 200
             screen.blit(play_but, (but_x, but_y))
-            string_rendered = pb_font.render(line, 1, pygame.Color('black'))
+            string_rendered = pb_font.render(line, True, pygame.Color('black'))
             intro_rect = string_rendered.get_rect()
             text_coord += -125
             intro_rect.top = text_coord
@@ -435,22 +445,26 @@ def final_screen():
             screen.blit(string_rendered, intro_rect)
 
         for event in pygame.event.get():
-
-            keys = pygame.key.get_pressed()
+            but_x = 100
+            but_y = 200
+            but_x2 = 100
+            but_y2 = 300
+            keys_pressed = pygame.key.get_pressed()
             if event.type == pygame.QUIT:
                 run = False
                 f = False
 
-            if keys[pygame.K_ESCAPE]:
+            if keys_pressed[pygame.K_ESCAPE]:
                 run = False
                 f = False
 
-            if keys[pygame.K_RETURN]:
+            if keys_pressed[pygame.K_RETURN]:
                 m_white.rect.x += randrange(1100, 1300)
                 robot.rect.x += randrange(1500, 1700)
+                robot2.rect.x += randrange(1800, 1900)
                 f = False
 
-            if keys[pygame.K_1]:
+            if keys_pressed[pygame.K_1]:
                 withdrawal_of_records()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
