@@ -182,12 +182,6 @@ def stopped(lt):
         screen.blit(string_rendered, intro_rect)
 
 
-def withdrawal_of_records():
-    file = open('results.txt', 'w', encoding='utf8')
-    file.write(f'record: {max(cnt_sc)}')
-    file.close()
-
-
 class White(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(obstacles_group, all_sprites)
@@ -389,7 +383,6 @@ def final_screen():
     global scores, run, f, f2, cnt2
     intro_text = ["GAME OVER"]
     hl_text = ['PLAY AGAIN']
-    el_text = ['OUTPUT RECORD']
     pb_font = pygame.font.Font(None, 30)
     if f2:
         fon = pygame.transform.scale(load_image('background1.png'), (w, h))
@@ -415,38 +408,24 @@ def final_screen():
         text_coord = 50
         cnt_sc.append(int(scores))
         text(
-            f'PRESS ENTER TO PLAY AGAIN, record: {str(max(cnt_sc))}, TO DISPLAY THE RESULTS IN A TXT FILE, PRESS 1',
+            f'record: {str(max(cnt_sc))}',
             50, 100)
 
         for line in hl_text:
             play_but.fill(pygame.Color('#2E8B57'))
             but_x2 = 100
-            but_y2 = 300
+            but_y2 = 230
             screen.blit(play_but, (but_x2, but_y2))
             string_rendered = pb_font.render(line, True, pygame.Color('black'))
             intro_rect = string_rendered.get_rect()
-            text_coord += 265
-            intro_rect.top = text_coord
-            intro_rect.x = 110
-            text_coord += intro_rect.height
-            screen.blit(string_rendered, intro_rect)
-
-        for line in el_text:
-            play_but.fill(pygame.Color('#2E8B57'))
-            but_x = 100
-            but_y = 200
-            screen.blit(play_but, (but_x, but_y))
-            string_rendered = pb_font.render(line, True, pygame.Color('black'))
-            intro_rect = string_rendered.get_rect()
-            text_coord += -125
+            text_coord += 200
             intro_rect.top = text_coord
             intro_rect.x = 110
             text_coord += intro_rect.height
             screen.blit(string_rendered, intro_rect)
 
         for event in pygame.event.get():
-            but_x = 100
-            but_y = 200
+
             but_x2 = 100
             but_y2 = 300
             keys_pressed = pygame.key.get_pressed()
@@ -464,9 +443,6 @@ def final_screen():
                 robot2.rect.x += randrange(1800, 1900)
                 f = False
 
-            if keys_pressed[pygame.K_1]:
-                withdrawal_of_records()
-
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
                 if but_x2 < pos[0] < but_x2 + 200 and but_y2 < pos[1] < but_y2 + 50:
@@ -474,8 +450,6 @@ def final_screen():
                     robot.rect.x += randrange(1500, 1700)
                     robot2.rect.x += randrange(1800, 1900)
                     f = False
-                if but_x < pos[0] < but_x + 200 and but_y < pos[1] < but_y + 50:
-                    withdrawal_of_records()
 
         cnt2, scores = 0, 0
         pygame.display.flip()
